@@ -3,7 +3,18 @@ module Selenium
 
     # Convenience methods not explicitely part of the protocol
     module Extensions
-	
+
+      # if there are pending Ajax requests wait for those to finish
+      # otherwise wait for a page reload
+      def wait_for_ajax_or_page(options={})
+        builder = JavascriptExpressionBuilder.new active_javascript_framework(options)
+        if js_eval(builder.no_pending_ajax_requests.script) == "false"
+          wait_for_ajax options
+        else
+          wait_for_page options[:timeout_in_seconds]
+        end
+      end
+
 	    # These for all Ajax request to finish (Only works if you are using prototype, the wait happens in the browser)
 	    #
 	    # See http://davidvollbracht.com/2008/6/4/30-days-of-tech-day-3-waitforajax for

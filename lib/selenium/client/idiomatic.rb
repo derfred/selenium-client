@@ -85,6 +85,8 @@ module Selenium
           wait_for_page options[:timeout_in_seconds]
 	      elsif options[:wait_for] == :ajax
 	          wait_for_ajax options
+        elsif options[:wait_for] == :ajax_or_page
+            wait_for_ajax_or_page options
 	      elsif options[:wait_for] == :element
 	          wait_for_element options[:element], options
 	      elsif options[:wait_for] == :no_element

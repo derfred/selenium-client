@@ -69,6 +69,59 @@ unit_tests do
     end
   end
 
+  describe "wait_for_ajax_or_page" do
+
+    test "should wait_for_page if no active requests exist and default js framework is prototype" do
+      client = Class.new { include Selenium::Client::Extensions }.new
+      client.stubs(:default_javascript_framework).returns(:prototype)
+      client.stubs(:js_eval).with("selenium.browserbot.getCurrentWindow().Ajax.activeRequestCount == 0;").returns("true")
+      client.expects(:wait_for_page)
+      client.wait_for_ajax_or_page
+    end
+
+    test "should wait_for_page if no active requests exist and default js framework is jQuery" do
+      client = Class.new { include Selenium::Client::Extensions }.new
+      client.stubs(:default_javascript_framework).returns(:jquery)
+      client.stubs(:js_eval).with("selenium.browserbot.getCurrentWindow().jQuery.active == 0;").returns("true")
+      client.expects(:wait_for_page)
+      client.wait_for_ajax_or_page
+    end
+
+    test "should wait_for_page and override default framework to decide if active requests exist" do
+      client = Class.new { include Selenium::Client::Extensions }.new
+      client.stubs(:default_javascript_framework).returns(:prototype)
+      client.stubs(:js_eval).with("selenium.browserbot.getCurrentWindow().jQuery.active == 0;").returns("true")
+      client.expects(:wait_for_page)
+      client.wait_for_ajax_or_page :javascript_framework => :jquery
+    end
+
+
+    test "should wait_for_ajax if active requests exist and default js framework is prototype" do
+      client = Class.new { include Selenium::Client::Extensions }.new
+      client.stubs(:default_javascript_framework).returns(:prototype)
+      client.stubs(:js_eval).with("selenium.browserbot.getCurrentWindow().Ajax.activeRequestCount == 0;").returns("false")
+      client.expects(:wait_for_ajax)
+      client.wait_for_ajax_or_page
+    end
+
+    test "should wait_for_ajax if active requests exist and default js framework is jQuery" do
+      client = Class.new { include Selenium::Client::Extensions }.new
+      client.stubs(:default_javascript_framework).returns(:jquery)
+      client.stubs(:js_eval).with("selenium.browserbot.getCurrentWindow().jQuery.active == 0;").returns("false")
+      client.expects(:wait_for_ajax)
+      client.wait_for_ajax_or_page
+    end
+
+    test "should wait_for_ajax and override default framework to decide if active requests exist" do
+      client = Class.new { include Selenium::Client::Extensions }.new
+      client.stubs(:default_javascript_framework).returns(:prototype)
+      client.stubs(:js_eval).with("selenium.browserbot.getCurrentWindow().jQuery.active == 0;").returns("false")
+      client.expects(:wait_for_ajax)
+      client.wait_for_ajax_or_page :javascript_framework => :jquery
+    end
+
+  end
+
   describe "wait_for_ajax" do
 
     test "wait_for_ajax uses Ajax.activeRequestCount when default js framework is prototype" do
